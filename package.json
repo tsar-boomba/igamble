@@ -6,7 +6,8 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"migrate:dev": "dotenv -e .env.development npx prisma migrate dev"
 	},
 	"dependencies": {
 		"@mantine/core": "^3.6.13",
@@ -14,6 +15,7 @@
 		"@mantine/next": "^3.6.13",
 		"@mantine/prism": "^3.6.13",
 		"@prisma/client": "^3.10.0",
+		"dotenv-cli": "^5.0.0",
 		"gray-matter": "^4.0.3",
 		"next": "12.1.0",
 		"next-mdx-remote": "^4.0.0",
