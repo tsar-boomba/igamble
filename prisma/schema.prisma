@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Post {
-	id			Int			@id @default(autoincrement())
+	id			String		@id @default(cuid())
 	createdAt	DateTime	@default(now())
 	updatedAt	DateTime	@updatedAt
 	title		String		@db.Text
@@ -19,47 +19,48 @@ model Post {
 	published	Boolean		@default(false)
 	likes		Int			@default(0)
 	author		User		@relation(fields: [authorId], references: [id])
-	tags		Tag[]
-	authorId 	Int
+	tags		PostsToTags[]
+	authorId 	String
 	comments 	Comment[]
 }
 
 model Comment {
-	id			Int			@id @default(autoincrement())
+	id			String		@id @default(cuid())
 	createdAt	DateTime	@default(now())
 	updatedAt	DateTime	@updatedAt
 	content		String		@db.Text
 	edited		Boolean		@default(false)
+	reply		Boolean		@default(false)
 	likes		Int			@default(0)
 	depth		Int
 	parent		Comment?	@relation("commentLineageRel", fields: [parentId], references: [id])
-	parentId	Int?
+	parentId	String?
 	children 	Comment[]	@relation("commentLineageRel")
-	postId		Int
 	post		Post		@relation(fields: [postId], references: [id])
+	postId		String
 	author		User		@relation(fields: [authorId], references: [id])
-	authorId 	Int
+	authorId 	String
 }
 
 model Profile {
-	id		Int		@id	@default(autoincrement())
+	id		String	@id	@default(cuid())
 	bio		String?	@db.Text
 	user	User	@relation(fields: [userId], references: [id])
-	userId	Int
+	userId	String
 }
 
 model Permissions {
-	id			Int		@id	@default(autoincrement())
+	id			String	@id	@default(cuid())
 	admin		Boolean	@default(false)
 	moderator	Boolean	@default(false)
 	post		Boolean	@default(false)
 	comment		Boolean	@default(true)
 	user		User	@relation(fields: [userId], references: [id])
-	userId		Int
+	userId		String
 }
 
 model User {
-	id			Int				@id	@default(autoincrement())
+	id			String			@id	@default(cuid())
 	email		String			@unique
 	firstName	String			@db.VarChar(25)
 	lastName	String			@db.VarChar(25)
@@ -72,5 +73,14 @@ model User {
 model Tag {
 	name	String	@id	@db.Text @unique
 	color	String
-	posts	Post[]
+	posts	PostsToTags[]
+}
+
+model PostsToTags {
+	post Post @relation(fields: [postId], references: [id])
+	postId String
+	tag Tag @relation(fields: [tagName], references: [name])
+	tagName String
+
+	@@id([postId, tagName])
 }
