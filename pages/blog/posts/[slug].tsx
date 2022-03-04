@@ -15,13 +15,13 @@ interface Props {
 const Post: NextPage<Props> = ({ source, data }) => {
 	if (!source)
 		return (
-			<Layout>
+			<Layout blog={true}>
 				<h1>Blog Post not found</h1>
 			</Layout>
 		);
 
 	return (
-		<Layout>
+		<Layout blog={true}>
 			<article>
 				<MDXRemote {...source} />
 			</article>

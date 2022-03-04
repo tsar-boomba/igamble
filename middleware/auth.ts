@@ -15,7 +15,7 @@ export const auth: RouteHandlerMiddleware<'both', WAuth> = {
 	ssr: true,
 	middleware: async (req, res, end) => {
 		const cookies = cookieParser(req.headers.cookie);
-		const accessToken = cookies['access_token'];
+		const accessToken = cookies['at'];
 		if (!accessToken) return;
 
 		const jwtSecret = process.env.JWT_SECRET;

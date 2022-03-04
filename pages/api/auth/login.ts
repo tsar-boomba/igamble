@@ -13,7 +13,7 @@ export default new RouteHandler().post(async (req, res) => {
 
 		res.setHeader(
 			'set-cookie',
-			`access_token=${token}; HttpOnly; Secure; Path=/; Expires=${new Date(
+			`at=${token}; HttpOnly; Secure; Path=/; Expires=${new Date(
 				Date.now() + 43200000 * 2,
 			).toUTCString()}`, // expires in 12 hours from browser
 		);

@@ -18,13 +18,13 @@ export default new RouteHandler().post(async (req, res) => {
 	const token = signJwt(res, savedUser.id);
 	if (typeof token !== 'string') {
 		console.log('no JWT_SECRET in environment variables.');
-		return;
+		return res.status(500).json({ message: 'Internal server error.' });
 	}
 
 	return res
 		.setHeader(
 			'set-cookie',
-			`access_token=${token}; HttpOnly; Secure; Path=/; Expires=${new Date(
+			`at=${token}; HttpOnly; Secure; Path=/; Expires=${new Date(
 				Date.now() + 43200000,
 			).toUTCString()}`, // expires in 12 hours from browser
 		)

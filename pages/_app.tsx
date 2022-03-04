@@ -1,14 +1,18 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+import { useRouter } from 'next/router';
 
 export default function App(props: AppProps) {
+	const router = useRouter();
+	const isBlog = router.pathname.match(/^\/blog/);
 	const { Component, pageProps } = props;
 
 	return (
 		<>
 			<Head>
-				<title>I Gamble</title>
+				<title>{isBlog ? 'IBlog' : 'Isaiah Gamble'}</title>
 				<meta
 					name='viewport'
 					content='minimum-scale=1, initial-scale=1, width=device-width'
@@ -23,7 +27,9 @@ export default function App(props: AppProps) {
 					colorScheme: 'dark',
 				}}
 			>
-				<Component {...pageProps} />
+				<ModalsProvider>
+					<Component {...pageProps} />
+				</ModalsProvider>
 			</MantineProvider>
 		</>
 	);

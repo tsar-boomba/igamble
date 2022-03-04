@@ -11,15 +11,14 @@ datasource db {
 }
 
 model Post {
-	id			String		@id @default(cuid())
-	createdAt	DateTime	@default(now())
-	updatedAt	DateTime	@updatedAt
-	title		String		@db.VarChar(255)
-	description	String		@db.VarChar(512)
-	content		String		@db.Text
-	published	Boolean		@default(false)
-	likes		Int			@default(0)
-	author		User		@relation(fields: [authorId], references: [id])
+	id			String			@id @default(cuid())
+	createdAt	DateTime		@default(now())
+	updatedAt	DateTime		@updatedAt
+	title		String			@db.VarChar(255)
+	description	String			@db.VarChar(512)
+	content		String			@db.Text
+	published	Boolean			@default(false)
+	author		User			@relation("postAuthor", fields: [authorId], references: [id])
 	tags		PostsToTags[]
 	authorId 	String
 	comments 	Comment[]
@@ -66,22 +65,22 @@ model User {
 	firstName	String			@db.VarChar(50)
 	lastName	String			@db.VarChar(50)
 	password	String			@db.VarChar(255)
-	posts		Post[]
+	posts		Post[]			@relation("postAuthor")
 	comments 	Comment[]
 	profile		Profile?
 	permissions Permissions?
 }
 
 model Tag {
-	name	String	@id	@db.Text @unique
+	name	String			@id	@db.Text @unique
 	color	String
 	posts	PostsToTags[]
 }
 
 model PostsToTags {
-	post Post @relation(fields: [postId], references: [id])
-	postId String
-	tag Tag @relation(fields: [tagName], references: [name])
+	post 	Post 	@relation(fields: [postId], references: [id])
+	postId 	String
+	tag 	Tag 	@relation(fields: [tagName], references: [name])
 	tagName String
 
 	@@id([postId, tagName])
