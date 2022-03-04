@@ -3,6 +3,7 @@ import { useForm } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import Link from 'next/link';
 import { useState } from 'react';
+import { mutate } from 'swr';
 
 const useStyles = createStyles(() => ({
 	form: {
@@ -55,6 +56,7 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 			body: JSON.stringify(data),
 		});
 
+		mutate('/api/auth/decode');
 		if (res.ok) return id && modals.closeModal(id());
 		setFetchMessage((await res.json()).message);
 	};

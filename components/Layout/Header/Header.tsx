@@ -4,6 +4,7 @@ import { useUser } from '@/utils/useUser';
 import { Button, Container, createStyles } from '@mantine/core';
 import { useModals } from '@mantine/modals';
 import Link from 'next/link';
+import { mutate } from 'swr';
 
 const useStyles = createStyles((theme) => ({
 	header: {
@@ -85,7 +86,12 @@ const Header: React.VFC<{ blog?: boolean }> = ({ blog }) => {
 							Login
 						</Button>
 					) : (
-						<Button sx={{ margin: '0 0 0 0.25rem' }}>Logout</Button>
+						<Button
+							sx={{ margin: '0 0 0 0.25rem' }}
+							onClick={() => fetch('/api/auth/logout').then(() => location.reload())}
+						>
+							Logout
+						</Button>
 					)}
 				</Container>
 			)}
