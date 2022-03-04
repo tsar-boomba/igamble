@@ -1,4 +1,4 @@
-import prisma from '@/utils/prisma';
+import prisma from '@/utils/api/prisma';
 import { RouteHandler } from 'next-route-handler';
 
 export default new RouteHandler()

@@ -14,7 +14,8 @@ model Post {
 	id			String		@id @default(cuid())
 	createdAt	DateTime	@default(now())
 	updatedAt	DateTime	@updatedAt
-	title		String		@db.Text
+	title		String		@db.VarChar(255)
+	description	String		@db.VarChar(512)
 	content		String		@db.Text
 	published	Boolean		@default(false)
 	likes		Int			@default(0)
@@ -44,7 +45,7 @@ model Comment {
 
 model Profile {
 	id		String	@id	@default(cuid())
-	bio		String?	@db.Text
+	bio		String?	@db.VarChar(255)
 	user	User	@relation(fields: [userId], references: [id])
 	userId	String
 }
@@ -62,8 +63,9 @@ model Permissions {
 model User {
 	id			String			@id	@default(cuid())
 	email		String			@unique
-	firstName	String			@db.VarChar(25)
-	lastName	String			@db.VarChar(25)
+	firstName	String			@db.VarChar(50)
+	lastName	String			@db.VarChar(50)
+	password	String			@db.VarChar(255)
 	posts		Post[]
 	comments 	Comment[]
 	profile		Profile?
