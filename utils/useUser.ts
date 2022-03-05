@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import fetcher from './fetch';
+import { UseUser } from './types';
 
 type UseUserParams = Partial<{
 	redirectIfNotFound: boolean;
@@ -26,10 +27,7 @@ export const useUser = ({
 		error,
 		isValidating,
 		mutate,
-	} = useSWR<Prisma.UserGetPayload<{ include: { permissions: true; profile: true } }>>(
-		'/api/auth/decode',
-		fetcher,
-	);
+	} = useSWR<UseUser>('/api/auth/decode', fetcher);
 	const redirectUrl = `${redirectTo}?from=${router.pathname || '/'}`;
 
 	if (!user && isValidating) {

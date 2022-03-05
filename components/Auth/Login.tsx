@@ -2,6 +2,7 @@ import { Anchor, Button, createStyles, PasswordInput, Text, TextInput } from '@m
 import { useForm } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
@@ -21,6 +22,7 @@ const useStyles = createStyles(() => ({
 
 const Login: React.VFC<{ id?: () => string }> = ({ id }) => {
 	const modals = useModals();
+	const router = useRouter();
 	const form = useForm({
 		initialValues: {
 			email: '',
@@ -43,7 +45,7 @@ const Login: React.VFC<{ id?: () => string }> = ({ id }) => {
 		});
 
 		mutate('/api/auth/decode');
-		if (res.ok) return id && modals.closeModal(id());
+		if (res.ok) return id ? modals.closeModal(id()) : router.push('/blog');
 		setFetchMessage((await res.json()).message);
 	};
 

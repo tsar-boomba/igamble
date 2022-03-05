@@ -1,7 +1,17 @@
-import { Anchor, Button, createStyles, PasswordInput, Text, TextInput } from '@mantine/core';
+import {
+	Anchor,
+	Button,
+	createStyles,
+	PasswordInput,
+	SegmentedControl,
+	Text,
+	TextInput,
+	useMantineColorScheme,
+} from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
@@ -21,6 +31,8 @@ const useStyles = createStyles(() => ({
 
 const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 	const modals = useModals();
+	const router = useRouter();
+	const { toggleColorScheme } = useMantineColorScheme();
 	const form = useForm({
 		initialValues: {
 			email: '',
@@ -28,6 +40,7 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 			lastName: '',
 			password: '',
 			confirmPassword: '',
+			theme: 'dark',
 		},
 		validationRules: {
 			email: (v) => /^\S+@\S+\.\S+$/.test(v),
@@ -37,6 +50,7 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 				v.length >= 8 &&
 				/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$/.test(v),
 			confirmPassword: (v, values) => v === values?.password,
+			theme: (v) => v === 'dark' || v === 'light',
 		},
 		errorMessages: {
 			email: 'Must be a valid email address.',
@@ -45,10 +59,12 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 			password:
 				'Must be at least 8 characters long, have at least 1 letter, 1 number, and 1 special character (@$!%*#?&-)',
 			confirmPassword: 'Must match password.',
+			theme: 'How?!?!!?',
 		},
 	});
 	const { classes } = useStyles();
 	const [fetchMessage, setFetchMessage] = useState('');
+	console.log(form.values);
 
 	const onSubmit = async ({ confirmPassword, ...data }: typeof form['values']) => {
 		const res = await fetch('/api/auth/register', {
@@ -57,7 +73,7 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 		});
 
 		mutate('/api/auth/decode');
-		if (res.ok) return id && modals.closeModal(id());
+		if (res.ok) return id ? modals.closeModal(id()) : router.push('/blog');
 		setFetchMessage((await res.json()).message);
 	};
 
@@ -104,6 +120,16 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 					{...form.getInputProps('confirmPassword')}
 				/>
 			</div>
+			<SegmentedControl
+				data={[
+					{ label: 'Dark', value: 'dark' },
+					{ label: 'Light', value: 'light' },
+				]}
+				onChange={(value: 'dark' | 'light') => {
+					toggleColorScheme(value);
+					form.setValues((prev) => ({ ...prev, theme: value }));
+				}}
+			/>
 
 			<Text color='red' align='center'>
 				{fetchMessage}

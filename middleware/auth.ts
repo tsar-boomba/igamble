@@ -5,7 +5,9 @@ import { verify } from 'jsonwebtoken';
 import { RouteHandlerMiddleware } from 'next-route-handler';
 
 export type WAuth = {
-	user: Prisma.UserGetPayload<{ include: { permissions: true; profile: true } }>;
+	user: Prisma.UserGetPayload<{
+		include: { permissions: true; profile: true; preferences: true };
+	}>;
 };
 
 export const AUTH_MIDDLEWARE_KEY = 'auth';
@@ -32,7 +34,7 @@ export const auth: RouteHandlerMiddleware<'both', WAuth> = {
 
 		const user = await prisma.user.findUnique({
 			where: { id: userToken.id },
-			include: { permissions: true, profile: true },
+			include: { permissions: true, profile: true, preferences: true },
 		});
 		if (!user) return;
 

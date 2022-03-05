@@ -1,22 +1,23 @@
 import Login from '@/components/Auth/Login';
 import SignUp from '@/components/Auth/SignUp';
 import { useUser } from '@/utils/useUser';
+import { withTheme } from '@/utils/withTheme';
 import { Button, Container, createStyles } from '@mantine/core';
 import { useModals } from '@mantine/modals';
 import Link from 'next/link';
-import { mutate } from 'swr';
+import UserMenu from '../UserMenu';
 
 const useStyles = createStyles((theme) => ({
 	header: {
 		display: 'flex',
 		alignItems: 'center',
-		backgroundColor: theme.colors.orange[7],
+		backgroundColor: theme.primaryColor,
 		color: 'white',
 		width: '100%',
 		padding: '0 0.5rem',
 	},
 	logo: {
-		color: 'white',
+		color: withTheme(theme, 'black', 'white'),
 		fontSize: '1.75rem',
 		height: '100%',
 		fontWeight: 'bold',
@@ -86,12 +87,7 @@ const Header: React.VFC<{ blog?: boolean }> = ({ blog }) => {
 							Login
 						</Button>
 					) : (
-						<Button
-							sx={{ margin: '0 0 0 0.25rem' }}
-							onClick={() => fetch('/api/auth/logout').then(() => location.reload())}
-						>
-							Logout
-						</Button>
+						<UserMenu user={user} />
 					)}
 				</Container>
 			)}

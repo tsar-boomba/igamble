@@ -5,7 +5,9 @@ import { hashSync } from 'bcrypt';
 import { RouteHandler } from 'next-route-handler';
 
 export default new RouteHandler().post(async (req, res) => {
-	const user: Prisma.UserCreateInput = JSON.parse(req.body);
+	const { theme, ...user }: Prisma.UserCreateInput & { theme: 'dark' | 'light' } = JSON.parse(
+		req.body,
+	);
 
 	if (await prisma.user.findUnique({ where: { email: user.email } }))
 		return res.status(400).json({ message: 'Email is already in use.' });
@@ -13,7 +15,9 @@ export default new RouteHandler().post(async (req, res) => {
 	const hashedPass = hashSync(user.password, 11);
 	user.password = hashedPass;
 
-	const savedUser = await prisma.user.create({ data: user });
+	const savedUser = await prisma.user.create({
+		data: { ...user, preferences: { create: { theme } } },
+	});
 
 	const token = signJwt(res, savedUser.id);
 	if (typeof token !== 'string') {
