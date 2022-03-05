@@ -120,6 +120,7 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 					{...form.getInputProps('confirmPassword')}
 				/>
 			</div>
+			<Text align='center'>Pick your preferred theme (This can be changed later).</Text>
 			<SegmentedControl
 				data={[
 					{ label: 'Dark', value: 'dark' },
