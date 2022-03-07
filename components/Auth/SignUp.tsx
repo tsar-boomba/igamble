@@ -44,8 +44,8 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 		},
 		validationRules: {
 			email: (v) => /^\S+@\S+\.\S+$/.test(v),
-			firstName: (v) => v.length >= 2 && /^\w+$/.test(v),
-			lastName: (v) => v.length >= 2 && /^\w+$/.test(v),
+			firstName: (v) => v.length >= 2 && v.length <= 50 && /^\w+$/.test(v),
+			lastName: (v) => v.length >= 2 && v.length <= 50 && /^\w+$/.test(v),
 			password: (v) =>
 				v.length >= 8 &&
 				/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$/.test(v),

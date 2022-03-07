@@ -12,12 +12,14 @@ export default new RouteHandler().post(async (req, res) => {
 	if (!/^\S+@\S+\.\S+$/.test(user.email)) {
 		return res.status(400).json({ message: 'Email must be a valid email address.' });
 	}
-	if (!(user.firstName.length >= 2 && /^\w+$/.test(user.firstName))) {
+	if (
+		!(user.firstName.length >= 2 && user.firstName.length <= 50 && /^\w+$/.test(user.firstName))
+	) {
 		return res
 			.status(400)
 			.json({ message: 'First name must be longer than 1 letter and contain no spaces.' });
 	}
-	if (!(user.lastName.length >= 2 && /^\w+$/.test(user.lastName))) {
+	if (!(user.lastName.length >= 2 && user.lastName.length <= 50 && /^\w+$/.test(user.lastName))) {
 		return res
 			.status(400)
 			.json({ message: 'Last name must be longer than 1 letter and contain no spaces.' });
