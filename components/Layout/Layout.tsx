@@ -16,6 +16,7 @@ const useStyles = createStyles((theme) => ({
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
+		width: '100%',
 		padding: '0 1rem',
 		flexGrow: 1,
 	},

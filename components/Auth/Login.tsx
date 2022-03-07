@@ -37,8 +37,6 @@ const Login: React.VFC<{ id?: () => string }> = ({ id }) => {
 	const [fetchMessage, setFetchMessage] = useState('');
 
 	const onSubmit = async (data: typeof form['values']) => {
-		console.log(data);
-
 		const res = await fetch('/api/auth/login', {
 			method: 'POST',
 			body: JSON.stringify(data),
@@ -60,7 +58,6 @@ const Login: React.VFC<{ id?: () => string }> = ({ id }) => {
 			/>
 			<PasswordInput
 				required
-				type='password'
 				label='Password'
 				placeholder='password'
 				sx={{ width: 185, margin: '0.25rem' }}

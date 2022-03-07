@@ -28,6 +28,7 @@ module.exports = {
 				avoidEscape: true,
 			},
 		],
+		'@typescript-eslint/ban-ts-comment': 'off',
 		'@typescript-eslint/no-empty-function': 'off',
 		'@typescript-eslint/no-empty-interface': 'off',
 		'@typescript-eslint/explicit-module-boundary-types': 'off',

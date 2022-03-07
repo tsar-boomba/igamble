@@ -64,7 +64,6 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 	});
 	const { classes } = useStyles();
 	const [fetchMessage, setFetchMessage] = useState('');
-	console.log(form.values);
 
 	const onSubmit = async ({ confirmPassword, ...data }: typeof form['values']) => {
 		const res = await fetch('/api/auth/register', {
@@ -106,7 +105,6 @@ const SignUp: React.VFC<{ id?: () => string }> = ({ id }) => {
 			<div className={classes.nameWrapper}>
 				<PasswordInput
 					required
-					type='password'
 					label='Password'
 					placeholder='password'
 					sx={{ width: 185, margin: '0.25rem' }}

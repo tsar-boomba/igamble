@@ -2,6 +2,7 @@ import { UseUser } from '@/utils/types';
 import { withTheme } from '@/utils/withTheme';
 import { Avatar, Container, createStyles } from '@mantine/core';
 import { useClickOutside } from '@mantine/hooks';
+import Link from 'next/link';
 import { useState } from 'react';
 import ThemeSwitch from './ThemeSwitch';
 
@@ -12,18 +13,20 @@ const useStyles = createStyles((theme) => ({
 		borderRadius: '50%',
 		cursor: 'pointer',
 		position: 'relative',
-		color: withTheme(theme, '', theme.colors.dark[9]),
+		color: withTheme(theme, theme.white, theme.colors.dark[9]),
 		fontWeight: 500,
 	},
 	menu: {
 		position: 'absolute',
-		top: '100%',
+		top: '110%',
 		right: 0,
 		padding: 0,
 		display: 'flex',
 		flexDirection: 'column',
 	},
 	menuButton: {
+		color: withTheme(theme, theme.white, theme.colors.dark[9]),
+		textDecoration: 'none',
 		width: '100%',
 		padding: '0.25rem 1.25rem',
 		backgroundColor: withTheme(theme, theme.colors.dark[6], theme.colors.light[2]),
@@ -47,7 +50,10 @@ const UserMenu: React.VFC<{ user: UseUser }> = ({ user }) => {
 	const ref = useClickOutside(() => setMenuOpen(false));
 
 	return (
-		<div className={classes.wrapper} onClick={() => setMenuOpen((prev) => true)}>
+		<div
+			className={classes.wrapper}
+			onClick={() => setMenuOpen((prev) => (prev ? true : true))}
+		>
 			<Avatar radius='xl'>
 				{!user.profile?.bio /* will be img in future */ &&
 					user.firstName[0] + user.lastName[0]}
@@ -60,6 +66,9 @@ const UserMenu: React.VFC<{ user: UseUser }> = ({ user }) => {
 					>
 						Logout
 					</Container>
+					<Link href='/blog/create-post'>
+						<a className={classes.menuButton}>Create Post</a>
+					</Link>
 					<Container className={classes.menuButton}>
 						Theme: <ThemeSwitch user={user} />
 					</Container>

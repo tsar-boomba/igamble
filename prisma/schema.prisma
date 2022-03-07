@@ -18,10 +18,28 @@ model Post {
 	description	String			@db.VarChar(512)
 	content		String			@db.Text
 	published	Boolean			@default(false)
+	thumbnail	Image?			@relation(fields: [thumbnailId], references: [id])
+	thumbnailId	String?
 	author		User			@relation("postAuthor", fields: [authorId], references: [id])
 	tags		PostsToTags[]
 	authorId 	String
 	comments 	Comment[]
+}
+
+enum ImageType {
+	THUMBNAIL
+	PROFILE
+	BANNER
+	IMAGE
+}
+
+model Image {
+	id			String	@id	@default(cuid())
+	type		ImageType
+	posts		Post[]
+	profiles	Profile[]
+	url			String
+	data		Bytes
 }
 
 model Comment {
@@ -43,10 +61,13 @@ model Comment {
 }
 
 model Profile {
-	id		String	@id	@default(cuid())
-	bio		String?	@db.VarChar(255)
-	user	User	@relation(fields: [userId], references: [id])
-	userId	String
+	id			String	@id	@default(cuid())
+	bio			String?	@db.VarChar(255)
+	picture		Image?	@relation(fields: [pictureId], references: [id])
+	pictureId	String?
+	pictureUrl	String?
+	user		User	@relation(fields: [userId], references: [id])
+	userId		String
 }
 
 model Permissions {

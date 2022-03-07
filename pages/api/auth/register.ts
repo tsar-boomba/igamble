@@ -9,6 +9,36 @@ export default new RouteHandler().post(async (req, res) => {
 		req.body,
 	);
 
+	if (!/^\S+@\S+\.\S+$/.test(user.email)) {
+		return res.status(400).json({ message: 'Email must be a valid email address.' });
+	}
+	if (!(user.firstName.length >= 2 && /^\w+$/.test(user.firstName))) {
+		return res
+			.status(400)
+			.json({ message: 'First name must be longer than 1 letter and contain no spaces.' });
+	}
+	if (!(user.lastName.length >= 2 && /^\w+$/.test(user.lastName))) {
+		return res
+			.status(400)
+			.json({ message: 'Last name must be longer than 1 letter and contain no spaces.' });
+	}
+	if (
+		!(
+			user.password.length >= 8 &&
+			/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&-])[A-Za-z\d@$!%*#?&-]{8,}$/.test(user.password)
+		)
+	) {
+		return res.status(400).json({
+			message:
+				'Password must be at least 8 characters long, have at least 1 letter, 1 number, and 1 special character (@$!%*#?&-)',
+		});
+	}
+	if (theme !== 'dark' && theme !== 'light') {
+		return res.status(400).json({
+			message: 'Theme must be either light or dark.',
+		});
+	}
+
 	if (await prisma.user.findUnique({ where: { email: user.email } }))
 		return res.status(400).json({ message: 'Email is already in use.' });
 
@@ -16,7 +46,16 @@ export default new RouteHandler().post(async (req, res) => {
 	user.password = hashedPass;
 
 	const savedUser = await prisma.user.create({
-		data: { ...user, preferences: { create: { theme } } },
+		data: {
+			...user,
+			preferences: { create: { theme } },
+			permissions: { create: { admin: false, comment: true, moderator: false, post: false } },
+			profile: {
+				create: {
+					bio: `Hi, my name is ${user.firstName} ${user.lastName} and I'm new here.`,
+				},
+			},
+		},
 	});
 
 	const token = signJwt(res, savedUser.id);
