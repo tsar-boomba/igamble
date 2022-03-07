@@ -10,20 +10,37 @@ datasource db {
 	url      = env("DATABASE_URL")
 }
 
-model Post {
-	id			String			@id @default(cuid())
+model PostEdit {
+	id			String			@id	@default(cuid())
 	createdAt	DateTime		@default(now())
-	updatedAt	DateTime		@updatedAt
-	title		String			@db.VarChar(255)
-	description	String			@db.VarChar(512)
-	content		String			@db.Text
-	published	Boolean			@default(false)
-	thumbnail	Image?			@relation(fields: [thumbnailId], references: [id])
+	title		String?
+	description	String?
+	content		String?
+	published	Boolean?
 	thumbnailId	String?
-	author		User			@relation("postAuthor", fields: [authorId], references: [id])
-	tags		PostsToTags[]
-	authorId 	String
-	comments 	Comment[]
+	tags		String[]
+	editedBy	String
+	editor		User			@relation(fields: [editedBy], references: [id])
+	postId		String
+	post		Post			@relation(fields: [postId], references: [id])
+}
+
+model Post {
+	id				String			@id @default(cuid())
+	createdAt		DateTime		@default(now())
+	updatedAt		DateTime		@updatedAt
+	title			String			@db.VarChar(255)
+	description		String			@db.VarChar(512)
+	content			String			@db.Text
+	published		Boolean			@default(false)
+	thumbnail		Image?			@relation(fields: [thumbnailId], references: [id])
+	thumbnailId		String?
+	thumbnailUrl	String?
+	edits			PostEdit[]
+	author			User			@relation("postAuthor", fields: [authorId], references: [id])
+	tags			PostsToTags[]
+	authorId 		String
+	comments 		Comment[]
 }
 
 enum ImageType {
@@ -33,41 +50,95 @@ enum ImageType {
 	IMAGE
 }
 
+model ImageEdit {
+	id			String			@id	@default(cuid())
+	createdAt	DateTime		@default(now())
+	url			String?
+	editedBy	String
+	editor		User			@relation(fields: [editedBy], references: [id])
+	imageId		String
+	image		Image			@relation(fields: [imageId], references: [id])
+}
+
 model Image {
-	id			String	@id	@default(cuid())
-	type		ImageType
-	posts		Post[]
-	profiles	Profile[]
-	url			String
-	data		Bytes
+	id				String		@id	@default(cuid())
+	type			ImageType
+	posts			Post[]
+	profilePictures	Profile[]	@relation("profilePicture")
+	bannerPictures	Profile[]	@relation("bannerPicture")
+	url				String
+	edits			ImageEdit[]
+}
+
+model CommentEdit {
+	id			String			@id	@default(cuid())
+	createdAt	DateTime		@default(now())
+	title		String?
+	description	String?
+	content		String?
+	published	Boolean?
+	thumbnailId	String?
+	tags		String[]
+	editedBy	String
+	editor		User			@relation(fields: [editedBy], references: [id])
+	commentId	String
+	post		Comment			@relation(fields: [commentId], references: [id])
 }
 
 model Comment {
-	id			String		@id @default(cuid())
-	createdAt	DateTime	@default(now())
-	updatedAt	DateTime	@updatedAt
-	content		String		@db.Text
-	edited		Boolean		@default(false)
-	reply		Boolean		@default(false)
-	likes		Int			@default(0)
+	id			String			@id @default(cuid())
+	createdAt	DateTime		@default(now())
+	updatedAt	DateTime		@updatedAt
+	content		String			@db.Text
+	edited		Boolean			@default(false)
+	reply		Boolean			@default(false)
+	likes		Int				@default(0)
 	depth		Int
-	parent		Comment?	@relation("commentLineageRel", fields: [parentId], references: [id])
+	parent		Comment?		@relation("commentLineageRel", fields: [parentId], references: [id])
 	parentId	String?
-	children 	Comment[]	@relation("commentLineageRel")
-	post		Post		@relation(fields: [postId], references: [id])
+	children 	Comment[]		@relation("commentLineageRel")
+	post		Post			@relation(fields: [postId], references: [id])
 	postId		String
-	author		User		@relation(fields: [authorId], references: [id])
+	author		User			@relation(fields: [authorId], references: [id])
 	authorId 	String
+	edits		CommentEdit[]
+}
+
+model ProfileEdit {
+	id			String			@id	@default(cuid())
+	createdAt	DateTime		@default(now())
+	bio			String?
+	pictureId	String?
+	bannerId	String?
+	editedBy	String
+	editor		User			@relation(fields: [editedBy], references: [id])
+	profileId	String
+	profile		Profile			@relation(fields: [profileId], references: [id])
 }
 
 model Profile {
 	id			String	@id	@default(cuid())
 	bio			String?	@db.VarChar(255)
-	picture		Image?	@relation(fields: [pictureId], references: [id])
+	picture		Image?	@relation("profilePicture", fields: [pictureId], references: [id])
 	pictureId	String?
-	pictureUrl	String?
+	banner		Image?	@relation("bannerPicture", fields: [bannerId], references: [id])
+	bannerId	String
 	user		User	@relation(fields: [userId], references: [id])
 	userId		String
+	edits		ProfileEdit[]
+}
+
+model PermissionsEdit {
+	id				String			@id	@default(cuid())
+	createdAt		DateTime		@default(now())
+	admin			Boolean?
+	moderator		Boolean?
+	post			Boolean?
+	comment			Boolean?
+	editedBy		String
+	editor			User			@relation(fields: [editedBy], references: [id])
+	permissionsId	String
+	permissions		Permissions		@relation(fields: [permissionsId], references: [id])
 }
 
 model Permissions {
@@ -78,6 +149,7 @@ model Permissions {
 	comment		Boolean	@default(true)
 	user		User	@relation(fields: [userId], references: [id])
 	userId		String
+	edits		PermissionsEdit[]
 }
 
 enum Theme {
@@ -93,22 +165,42 @@ model Preferences {
 }
 
 model User {
-	id			String			@id	@default(cuid())
-	email		String			@unique
-	firstName	String			@db.VarChar(50)
-	lastName	String			@db.VarChar(50)
-	password	String			@db.Text
-	posts		Post[]			@relation("postAuthor")
-	comments 	Comment[]
-	profile		Profile?
-	permissions Permissions?
-	preferences	Preferences?
+	id					String			@id	@default(cuid())
+	email				String			@unique
+	firstName			String			@db.VarChar(50)
+	lastName			String			@db.VarChar(50)
+	password			String			@db.Text
+	createdAt			DateTime		@default(now())
+	updatedAt			DateTime		@updatedAt
+	posts				Post[]			@relation("postAuthor")
+	comments 			Comment[]
+	postEdits			PostEdit[]
+	commentEdits		CommentEdit[]
+	imageEdits			ImageEdit[]
+	profileEdits		ProfileEdit[]
+	permissionsEdits	PermissionsEdit[]
+	tagEdits			TagEdit[]
+	profile				Profile?
+	permissions 		Permissions?
+	preferences			Preferences?
+}
+
+model TagEdit {
+	id			String		@id	@default(cuid())
+	createdAt	DateTime	@default(now())
+	name		String?
+	color		String?
+	editedBy	String
+	editor		User		@relation(fields: [editedBy], references: [id])
+	tagName		String
+	tag			Tag			@relation(fields: [tagName], references: [name])
 }
 
 model Tag {
 	name	String			@id	@db.Text @unique
 	color	String
 	posts	PostsToTags[]
+	edits	TagEdit[]
 }
 
 model PostsToTags {

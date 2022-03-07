@@ -60,17 +60,20 @@ const UserMenu: React.VFC<{ user: UseUser }> = ({ user }) => {
 			</Avatar>
 			{menuOpen && (
 				<Container className={classes.menu} ref={ref}>
-					<Container
-						className={classes.menuButton}
-						onClick={() => fetch('/api/auth/logout').then(() => location.reload())}
-					>
-						Logout
-					</Container>
+					<Link href={`/blog/users/${user.id}`}>
+						<a className={classes.menuButton}>My Profile</a>
+					</Link>
 					<Link href='/blog/create-post'>
 						<a className={classes.menuButton}>Create Post</a>
 					</Link>
 					<Container className={classes.menuButton}>
 						Theme: <ThemeSwitch user={user} />
+					</Container>
+					<Container
+						className={classes.menuButton}
+						onClick={() => fetch('/api/auth/logout').then(() => location.reload())}
+					>
+						Logout
 					</Container>
 				</Container>
 			)}
