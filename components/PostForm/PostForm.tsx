@@ -1,4 +1,4 @@
-import { Button, createStyles, Textarea, TextInput } from '@mantine/core';
+import { Button, Center, createStyles, Textarea, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
 import { useFirstRender } from '@/utils/useFirstRender';
 import { useState, useEffect, useRef, KeyboardEventHandler } from 'react';
@@ -7,6 +7,9 @@ import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { Prism } from '@mantine/prism';
 import { withTheme } from '@/utils/withTheme';
 import Link from 'next/link';
+import TagSelector from './TagSelector';
+import { useModals } from '@mantine/modals';
+import TagForm from '../Tag/TagForm';
 
 interface Props {
 	create: boolean;
@@ -65,11 +68,19 @@ const tabInTextArea: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
 
 const PostForm: React.VFC<Props> = ({ create, defaultPost }) => {
 	const { classes } = useStyles();
+	const modals = useModals();
 	const [contentValid, setContentValid] = useState({ value: true, message: '' || undefined });
 	const [previewContent, setPreviewContent] =
 		useState<MDXRemoteSerializeResult<Record<string, unknown>>>();
-	const isFirstRender = useFirstRender();
+	const [tags, setTags] = useState<string[]>([]);
 	const timeout = useRef<NodeJS.Timeout>();
+
+	const openTagCreateModal = () => {
+		const id = modals.openModal({
+			title: 'Create a tag.',
+			children: <TagForm id={() => id} />,
+		});
+	};
 
 	const form = useForm({
 		initialValues: {
@@ -115,8 +126,35 @@ const PostForm: React.VFC<Props> = ({ create, defaultPost }) => {
 	return (
 		<>
 			<form className={classes.wrapper} onSubmit={form.onSubmit(onSubmit)}>
-				<TextInput {...form.getInputProps('title')} label='Title' required />
-				<Textarea {...form.getInputProps('description')} label='Description' required />
+				<Textarea
+					{...form.getInputProps('title')}
+					sx={{ width: 'clamp(300px, 500px, 100%)' }}
+					label='Title'
+					minRows={1}
+					maxLength={255}
+					maxRows={10}
+					autosize
+					required
+				/>
+				<Textarea
+					{...form.getInputProps('description')}
+					sx={{ width: 'clamp(300px, 800px, 100%)' }}
+					label='Description'
+					minRows={3}
+					maxLength={512}
+					maxRows={30}
+					autosize
+					required
+				/>
+				<TagSelector
+					state={[tags, setTags]}
+					label='Select Tags'
+					sx={{ width: 'clamp(300px, 500px, 100%)' }}
+					required
+				/>
+				<Button type='button' onClick={openTagCreateModal} mt='1rem'>
+					Create Tag
+				</Button>
 				<h4 style={{ marginBottom: 0 }}>
 					Content<span style={{ color: 'red' }}>*</span>
 				</h4>
@@ -154,6 +192,29 @@ const PostForm: React.VFC<Props> = ({ create, defaultPost }) => {
 				<p style={{ color: 'red' }}>{contentValid.message}</p>
 				<Button type='submit' sx={{ marginTop: '1rem' }}>
 					Create
+				</Button>
+
+				<Button
+					type='button'
+					sx={{ margin: '0.25rem', marginTop: '1rem' }}
+					onClick={() =>
+						localStorage.setItem('savedPost', JSON.stringify({ ...form.values, tags }))
+					}
+				>
+					Save For Later
+				</Button>
+				<Button
+					type='button'
+					sx={{ margin: '0.25rem' }}
+					onClick={() => {
+						const stringPost = localStorage.getItem('savedPost');
+						if (!stringPost) return;
+						const post = JSON.parse(stringPost);
+						form.setValues(() => post);
+						setTags(post.tags);
+					}}
+				>
+					Load Saved Post
 				</Button>
 			</form>
 		</>

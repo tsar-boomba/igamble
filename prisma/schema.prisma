@@ -33,6 +33,7 @@ model Post {
 	description		String			@db.VarChar(512)
 	content			String			@db.Text
 	published		Boolean			@default(false)
+	pinnedBy		User[]			@relation("pinned")
 	thumbnail		Image?			@relation(fields: [thumbnailId], references: [id])
 	thumbnailId		String?
 	thumbnailUrl	String?
@@ -122,7 +123,7 @@ model Profile {
 	picture		Image?	@relation("profilePicture", fields: [pictureId], references: [id])
 	pictureId	String?
 	banner		Image?	@relation("bannerPicture", fields: [bannerId], references: [id])
-	bannerId	String
+	bannerId	String?
 	user		User	@relation(fields: [userId], references: [id])
 	userId		String
 	edits		ProfileEdit[]
@@ -172,6 +173,8 @@ model User {
 	password			String			@db.Text
 	createdAt			DateTime		@default(now())
 	updatedAt			DateTime		@updatedAt
+	pinnedPostId		String?
+	pinnedPost			Post?			@relation("pinned", fields: [pinnedPostId], references: [id])
 	posts				Post[]			@relation("postAuthor")
 	comments 			Comment[]
 	postEdits			PostEdit[]
@@ -189,7 +192,8 @@ model TagEdit {
 	id			String		@id	@default(cuid())
 	createdAt	DateTime	@default(now())
 	name		String?
-	color		String?
+	background	String?
+	font		String?
 	editedBy	String
 	editor		User		@relation(fields: [editedBy], references: [id])
 	tagName		String
@@ -197,10 +201,11 @@ model TagEdit {
 }
 
 model Tag {
-	name	String			@id	@db.Text @unique
-	color	String
-	posts	PostsToTags[]
-	edits	TagEdit[]
+	name		String			@id	@db.Text @unique
+	background	String
+	font		String
+	posts		PostsToTags[]
+	edits		TagEdit[]
 }
 
 model PostsToTags {

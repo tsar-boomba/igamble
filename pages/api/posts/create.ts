@@ -5,13 +5,21 @@ import { RouteHandler } from 'next-route-handler';
 export default new RouteHandler<'api', WAuth>().use(auth).post(async (req, res) => {
 	if (!req.user || !req.user.permissions?.post)
 		return res.status(403).json({ message: 'You are not authorized to post.' });
-	const post: { title: string; content: string; description: string } = JSON.parse(req.body);
+	const {
+		tags,
+		...post
+	}: { title: string; content: string; description: string; tags: string[] } = JSON.parse(
+		req.body,
+	);
 
 	const savedPost = await prisma.post.create({
 		data: {
 			...post,
 			authorId: req.user.id,
 			published: false,
+			tags: {
+				create: tags.map((tag) => ({ tagName: tag })),
+			},
 		},
 	});
 
